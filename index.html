@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alexandras Documents</title>
+  <style>
+    :root {
+      --bg: #f3f1ec;
+      --panel: #fffdf8;
+      --ink: #1f1f1f;
+      --muted: #666157;
+      --accent: #005f73;
+      --line: #dfd8ca;
+      --chip: #e7efe7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 15% 15%, #fffef9 0%, var(--bg) 45%, #e9e3d8 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .title {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .credit {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .stats {
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      font-size: 14px;
+    }
+    .stats-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .stats-types {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .toolbar input {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-width: 280px;
+      font-size: 14px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 16px;
+      min-height: 74vh;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.04);
+    }
+    .panel-head {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+    .list {
+      max-height: calc(74vh - 44px);
+      overflow: auto;
+    }
+    .item {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      transition: background-color 140ms ease;
+    }
+    .item:hover { background: #f7f4ed; }
+    .item.active { background: #edf4f4; border-left: 4px solid var(--accent); padding-left: 10px; }
+    .item:last-child { border-bottom: 0; }
+    .item-date {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .item-subject {
+      font-size: 14px;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+    .detail {
+      padding: 16px;
+      overflow: auto;
+      max-height: calc(74vh);
+    }
+    .field { margin-bottom: 14px; }
+    .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .value {
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .value ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+    }
+    .value li {
+      margin: 4px 0;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      font-size: 13px;
+    }
+    .data-table th,
+    .data-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+    .data-table th {
+      background: #f7f4ed;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .data-table tr:last-child td {
+      border-bottom: 0;
+    }
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: var(--chip);
+      border: 1px solid #cfe0cf;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    .link {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dashed currentColor;
+    }
+    .empty {
+      padding: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .list { max-height: 38vh; }
+      .detail { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">Αποφάσεις για Προσφυγικά Αλεξάνδρας</h1>
+    <p class="credit">Ανάπτυξη: <a class="link" href="https://troboukis.github.io" target="_blank" rel="noopener noreferrer">Θανάσης Τρομπούκης</a> με χρήση Codex</p>
+    <p id="subtitle" class="subtitle">Πηγή: Διαύγεια | Τελευταία ενημέρωση: - | Ταξινόμηση: πιο πρόσφατες πρώτα</p>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Αναζήτηση σε subject / ADA / description / εταιρείες">
+    </div>
+    <div id="stats" class="stats">
+      <div id="stats-title" class="stats-title">Έχουν βρεθεί 0 εγγραφές στη Διαύγεια.</div>
+      <div id="stats-types" class="stats-types">Από αυτές:</div>
+    </div>
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <span>Εγγραφές</span>
+          <span id="count">0</span>
+        </div>
+        <div id="list" class="list"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head">
+          <span>Λεπτομέρειες</span>
+        </div>
+        <div id="detail" class="detail">
+          <div class="empty">Επίλεξε μια εγγραφή από τη λίστα.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const CSV_PATH = "data_alexandras.csv";
+    let allRows = [];
+    let filteredRows = [];
+    let activeId = null;
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let field = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const next = text[i + 1];
+
+        if (ch === '"') {
+          if (inQuotes && next === '"') {
+            field += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+          continue;
+        }
+
+        if (ch === "," && !inQuotes) {
+          row.push(field);
+          field = "";
+          continue;
+        }
+
+        if ((ch === "\n" || ch === "\r") && !inQuotes) {
+          if (ch === "\r" && next === "\n") i++;
+          row.push(field);
+          if (row.some(v => v.length > 0)) rows.push(row);
+          row = [];
+          field = "";
+          continue;
+        }
+
+        field += ch;
+      }
+
+      if (field.length > 0 || row.length > 0) {
+        row.push(field);
+        rows.push(row);
+      }
+
+      if (!rows.length) return [];
+      const headers = rows[0];
+      return rows.slice(1).map((values, idx) => {
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = values[i] || ""; });
+        obj._id = idx + 1;
+        obj._timestamp = parseGreekDate(obj.issueDate);
+        obj._analysis = parseAnalysisFields(obj);
+        return obj;
+      });
+    }
+
+    function parseJsonField(raw, fallback) {
+      if (raw === null || raw === undefined) return fallback;
+      if (typeof raw !== "string") return raw;
+      if (!raw.trim()) return fallback;
+      const val = String(raw).trim();
+      try {
+        return JSON.parse(val);
+      } catch (_) {
+        try {
+          return JSON.parse(val.replaceAll("'", '"'));
+        } catch (_) {
+          return fallback;
+        }
+      }
+    }
+
+    function parseAnalysisFields(row) {
+      const summaryJson = parseJsonField(row.summary, {});
+      const table = parseJsonField(row.table, parseJsonField(summaryJson.table, []));
+      let companies = parseJsonField(row.companies, parseJsonField(summaryJson.companies, []));
+      let pages = parseJsonField(row.pages, parseJsonField(summaryJson.pages, []));
+
+      if (!Array.isArray(companies) && row.companies) {
+        companies = String(row.companies).split(",").map(s => s.trim()).filter(Boolean);
+      } else if (!Array.isArray(companies) && summaryJson.companies) {
+        companies = String(summaryJson.companies).split(",").map(s => s.trim()).filter(Boolean);
+      }
+      if (!Array.isArray(pages) && row.pages) {
+        pages = String(row.pages)
+          .split(",")
+          .map(s => Number(s.trim()))
+          .filter(n => Number.isFinite(n));
+      } else if (!Array.isArray(pages) && summaryJson.pages) {
+        pages = String(summaryJson.pages)
+          .split(",")
+          .map(s => Number(s.trim()))
+          .filter(n => Number.isFinite(n));
+      }
+
+      return {
+        relevance: (row.relevance || summaryJson.relevance || "").trim(),
+        description: row.description || summaryJson.description || "",
+        table: Array.isArray(table) ? table : [],
+        companies: Array.isArray(companies) ? companies : [],
+        pages: Array.isArray(pages) ? pages : [],
+        extras: row.extras || summaryJson.extras || ""
+      };
+    }
+
+    function parseGreekDate(raw) {
+      if (!raw) return 0;
+      const m = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}):(\d{2}))?/);
+      if (!m) return 0;
+      const day = Number(m[1]);
+      const month = Number(m[2]) - 1;
+      const year = Number(m[3]);
+      const hh = Number(m[4] || "0");
+      const mm = Number(m[5] || "0");
+      const ss = Number(m[6] || "0");
+      return new Date(year, month, day, hh, mm, ss).getTime();
+    }
+
+    function formatDateOnly(d) {
+      return new Intl.DateTimeFormat("el-GR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(d);
+    }
+
+    function updateSubtitle(lastModifiedHeader) {
+      const el = document.getElementById("subtitle");
+      let updated = "-";
+      if (lastModifiedHeader) {
+        const d = new Date(lastModifiedHeader);
+        if (!Number.isNaN(d.getTime())) updated = formatDateOnly(d);
+      }
+      el.textContent = `Πηγή: Διαύγεια | Τελευταία ενημέρωση: ${updated} | Ταξινόμηση: πιο πρόσφατες πρώτα`;
+    }
+
+    function updateStats(rows) {
+      const total = rows.length;
+      const counts = rows.reduce((acc, r) => {
+        const k = (r.decisionType || "Άγνωστο").trim() || "Άγνωστο";
+        acc[k] = (acc[k] || 0) + 1;
+        return acc;
+      }, {});
+
+      const parts = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, v]) => `${v} είναι ${k}`);
+
+      document.getElementById("stats-title").textContent =
+        `Έχουν βρεθεί ${total} εγγραφές στη Διαύγεια.`;
+      document.getElementById("stats-types").textContent =
+        parts.length ? `Από αυτές, ${parts.join(" | ")}.` : "Από αυτές: -";
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function formatMoney(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return escapeHtml(value ?? "");
+      return new Intl.NumberFormat("el-GR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+    }
+
+    function maybeMultiline(s) {
+      return escapeHtml(s || "").replace(/\n/g, "<br>");
+    }
+
+    function renderAnalysisTable(tableRows) {
+      if (!Array.isArray(tableRows) || !tableRows.length) return '<div class="value">-</div>';
+      const hasObjectRows = tableRows.some(r => r && typeof r === "object" && !Array.isArray(r));
+
+      if (!hasObjectRows) {
+        const body = tableRows.map(item =>
+          `<tr><td>${maybeMultiline(String(item || "")) || "-"}</td></tr>`
+        ).join("");
+        return `<div class="table-wrap"><table class="data-table"><thead><tr><th>Στοιχείο</th></tr></thead><tbody>${body}</tbody></table></div>`;
+      }
+
+      const colDefs = [
+        ["code", "Κωδικός"],
+        ["title_old", "Τίτλος (παλιός)"],
+        ["title_new", "Τίτλος (νέος)"],
+        ["title", "Τίτλος"],
+        ["pre_budget_eur", "Πρ. Προϋπ. (€)"],
+        ["proposed_budget_eur", "Προτ. Προϋπ. (€)"],
+        ["proposed_credits_2021_eur", "Προτ. Πίστωση 2021 (€)"],
+        ["type", "Τύπος"],
+        ["notes", "Σημειώσεις"],
+        ["page", "Σελίδα"]
+      ];
+
+      const visibleCols = colDefs.filter(([key]) =>
+        tableRows.some(r => r && typeof r === "object" && String(r?.[key] ?? "").trim() !== "")
+      );
+      if (!visibleCols.length) {
+        const dynamicKeys = Array.from(new Set(
+          tableRows
+            .filter(r => r && typeof r === "object" && !Array.isArray(r))
+            .flatMap(r => Object.keys(r))
+        ));
+        if (!dynamicKeys.length) return '<div class="value">-</div>';
+
+        const head = dynamicKeys.map(k => `<th>${escapeHtml(k)}</th>`).join("");
+        const body = tableRows.map(row => {
+          const tds = dynamicKeys.map(key => `<td>${maybeMultiline(String(row?.[key] ?? "")) || "-"}</td>`).join("");
+          return `<tr>${tds}</tr>`;
+        }).join("");
+        return `<div class="table-wrap"><table class="data-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+      }
+
+      const head = visibleCols.map(([, label]) => `<th>${escapeHtml(label)}</th>`).join("");
+      const body = tableRows.map(row => {
+        const tds = visibleCols.map(([key]) => {
+          const raw = row?.[key] ?? "";
+          const value = ["pre_budget_eur", "proposed_budget_eur", "proposed_credits_2021_eur"].includes(key)
+            ? formatMoney(raw)
+            : maybeMultiline(String(raw));
+          return `<td>${value || "-"}</td>`;
+        }).join("");
+        return `<tr>${tds}</tr>`;
+      }).join("");
+
+      return `<div class="table-wrap"><table class="data-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+    }
+
+    function renderList(rows) {
+      const list = document.getElementById("list");
+      const count = document.getElementById("count");
+      count.textContent = String(rows.length);
+
+      if (!rows.length) {
+        list.innerHTML = '<div class="empty">Δεν βρέθηκαν εγγραφές.</div>';
+        return;
+      }
+
+      list.innerHTML = rows.map(r => `
+        <article class="item ${r._id === activeId ? "active" : ""}" data-id="${r._id}">
+          <div class="item-date">${escapeHtml(r.issueDate || "-")}</div>
+          <div class="item-subject">${escapeHtml(r.subject || "(χωρίς subject)")}</div>
+        </article>
+      `).join("");
+
+      list.querySelectorAll(".item").forEach(el => {
+        el.addEventListener("click", () => {
+          activeId = Number(el.dataset.id);
+          renderList(filteredRows);
+          renderDetail(filteredRows.find(r => r._id === activeId));
+        });
+      });
+    }
+
+    function renderDetail(row) {
+      const detail = document.getElementById("detail");
+      if (!row) {
+        detail.innerHTML = '<div class="empty">Επίλεξε μια εγγραφή από τη λίστα.</div>';
+        return;
+      }
+      const analysis = row._analysis || {};
+      const companiesHtml = analysis.companies?.length
+        ? `<div class="chips">${analysis.companies.map(c => `<span class="chip">${escapeHtml(c)}</span>`).join("")}</div>`
+        : '<div class="value">-</div>';
+      const pagesHtml = analysis.pages?.length
+        ? `<div class="chips">${analysis.pages.map(p => `<span class="chip">σελ. ${escapeHtml(p)}</span>`).join("")}</div>`
+        : '<div class="value">-</div>';
+
+      detail.innerHTML = `
+        <div class="field">
+          <div class="label">Subject</div>
+          <div class="value">${escapeHtml(row.subject)}</div>
+        </div>
+        <div class="field">
+          <div class="label">Ημερομηνία</div>
+          <div class="value">${escapeHtml(row.issueDate)}</div>
+        </div>
+        <div class="field chips">
+          <span class="chip">${escapeHtml(row.documentType)}</span>
+          <span class="chip">${escapeHtml(row.decisionType)}</span>
+          <span class="chip">ADA: ${escapeHtml(row.ada)}</span>
+        </div>
+        <div class="field">
+          <div class="label">Φορέας</div>
+          <div class="value">${escapeHtml(row.label)}</div>
+        </div>
+        <div class="field">
+          <div class="label">Link</div>
+          <div class="value"><a class="link" href="${encodeURI(row.documentUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.documentUrl)}</a></div>
+        </div>
+        <div class="field">
+          <div class="label">Relevance</div>
+          <div class="value">${escapeHtml(analysis.relevance || "-")}</div>
+        </div>
+        <div class="field">
+          <div class="label">Description</div>
+          <div class="value">${maybeMultiline(analysis.description || "") || "-"}</div>
+        </div>
+        <div class="field">
+          <div class="label">Table</div>
+          ${renderAnalysisTable(analysis.table || [])}
+        </div>
+        <div class="field">
+          <div class="label">Companies</div>
+          ${companiesHtml}
+        </div>
+        <div class="field">
+          <div class="label">Pages</div>
+          ${pagesHtml}
+        </div>
+        <div class="field">
+          <div class="label">Extras</div>
+          <div class="value">${maybeMultiline(analysis.extras || "") || "-"}</div>
+        </div>
+      `;
+    }
+
+    function applySearch() {
+      const q = document.getElementById("search").value.trim().toLowerCase();
+      if (!q) {
+        filteredRows = [...allRows];
+      } else {
+        filteredRows = allRows.filter(r =>
+          (r.subject || "").toLowerCase().includes(q) ||
+          (r.ada || "").toLowerCase().includes(q) ||
+          (r._analysis?.relevance || "").toLowerCase().includes(q) ||
+          (r._analysis?.description || "").toLowerCase().includes(q) ||
+          (r._analysis?.extras || "").toLowerCase().includes(q) ||
+          (r._analysis?.companies || []).join(" ").toLowerCase().includes(q) ||
+          (r._analysis?.pages || []).join(" ").toLowerCase().includes(q) ||
+          JSON.stringify(r._analysis?.table || []).toLowerCase().includes(q)
+        );
+      }
+      if (!filteredRows.some(r => r._id === activeId)) {
+        activeId = filteredRows[0]?._id ?? null;
+      }
+      renderList(filteredRows);
+      renderDetail(filteredRows.find(r => r._id === activeId));
+    }
+
+    async function bootstrap() {
+      const detail = document.getElementById("detail");
+      detail.innerHTML = '<div class="empty">Φόρτωση δεδομένων...</div>';
+
+      try {
+        const resp = await fetch(CSV_PATH, { cache: "no-store" });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        updateSubtitle(resp.headers.get("last-modified"));
+        const csv = await resp.text();
+        allRows = parseCsv(csv).sort((a, b) => b._timestamp - a._timestamp);
+        updateStats(allRows);
+        filteredRows = [...allRows];
+        activeId = filteredRows[0]?._id ?? null;
+        renderList(filteredRows);
+        renderDetail(filteredRows.find(r => r._id === activeId));
+      } catch (err) {
+        detail.innerHTML = `<div class="empty">Αποτυχία φόρτωσης του <code>${CSV_PATH}</code>.<br>Άνοιξε το app μέσω local server (όχι απευθείας <code>file://</code>).<br><br>Σφάλμα: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    document.getElementById("search").addEventListener("input", applySearch);
+    bootstrap();
+  </script>
+</body>
+</html>

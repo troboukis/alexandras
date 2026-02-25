@@ -1,0 +1,25 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+
+# Local Python environments
+.venv/
+.alexandras/
+
+# Python cache / tooling
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Generated logs
+logs/
+*.log
+
+# Cached source documents (keep final CSV tracked)
+data/pdfs/
+data/openai_simple_summaries.csv
+
+# OS/editor noise
+.DS_Store
