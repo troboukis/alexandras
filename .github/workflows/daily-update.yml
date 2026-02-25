@@ -38,6 +38,15 @@ jobs:
         run: |
           python update_alexandras_data.py --verbose
 
+      - name: Upload run logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alexandras-logs-run-${{ github.run_number }}
+          path: logs/*.log
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Commit and push CSV changes
         run: |
           git config user.name "github-actions[bot]"
